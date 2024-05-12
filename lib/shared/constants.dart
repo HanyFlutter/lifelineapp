@@ -1,137 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:lifeline/layout/home_screen/blood_bank_home_screen/blood_bank_home_screen.dart';
+import 'package:lifeline/layout/home_screen/hospital_home_screen/hospital_home_screen.dart';
+import 'package:lifeline/layout/home_screen/user_home_screen/user_home_screen.dart';
+import 'package:lifeline/shared/const_hospital_deteals.dart';
+import 'package:lifeline/modules/login_screen/login_screen.dart';
+import 'package:lifeline/network/local/shared_preferences_helper.dart';
+import 'package:lifeline/shared/const_text_controllers.dart';
 
-////////////////////////////////
-/*
- validation functions
-*/
-String? validateEmail(String value) {
-  String pattern = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
-  RegExp regex = RegExp(pattern);
-  if (value.isEmpty) {
-    return 'حقل البريد الالكتروني فارغ';
-  }
-  if (!regex.hasMatch(value)) {
-    return 'هذا ليس بريد الكتروني صحيح';
-  }
-  return null;
-}
-bool validatePassword(String password) {
-  // Regular expressions for password validation
-  RegExp upperCaseRegex = RegExp(r'[A-Z]');
-  RegExp lowerCaseRegex = RegExp(r'[a-z]');
-  RegExp digitRegex = RegExp(r'[0-9]');
-  RegExp specialCharRegex = RegExp(r'[!@#$%^&*()_+=\[\]{};:"\\|,.<>?/]');
-
-  // Checking length
-  if (password.length < 8 || password.length > 20) {
-    return false;
-  }
-
-  if (!upperCaseRegex.hasMatch(password)) {
-    return false;
-  }
-
-  if (!lowerCaseRegex.hasMatch(password)) {
-    return false;
-  }
-
-  if (!digitRegex.hasMatch(password)) {
-    return false;
-  }
-
-  if (!specialCharRegex.hasMatch(password)) {
-    return false;
-  }
-  return true;
-}
-bool validateEgyptianPhoneNumber(String phoneNumber) {
-  // Regular expression for Egyptian phone numbers starting with 10, 11, 12, or 15 and having exactly 10 digits
-  RegExp regex = RegExp(r"^(10|11|12|15|010|011|012|015)\d{8}$");
-
-  return regex.hasMatch(phoneNumber);
-}
-String? validateName(String value) {
-  RegExp name = RegExp(r'^[a-zA-Z\u0600-\u06FF\s]+$');
-  if (value.isEmpty) {
-    return 'خانة الاسم مطلوبة ';
-  }
-  if (!name.hasMatch(value)) {
-    return 'اسم غير صالح';
-  }
-
-  return null;
-}
-
-/////////////////////////////////////
-/*
- selected listed and items
-*/
-List<String> select_list_join_as_in_registration = [ 'مستشفى', 'شخصي'];
-List<String> select_list_join_as_in_login = ['بنك دم', 'مستشفى', 'شخصي'];
-String selectedItemJoinAsLogin = select_list_join_as_in_login[2];
-String selectedItemJoinAsRegistration = select_list_join_as_in_registration[1];
-List<String> genderMenu = ['ذكر', 'أنثي'];
-String selectedGenderItem = genderMenu[0];
-List<String> bloodTypeMenu = ['O−', 'O+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+'];
-String selectedBloodTypeMenu = bloodTypeMenu[0];
-Map<String, List<String>> cityList = {
-  "الإسكندرية": ["الإسكندرية"],
-  "أسوان": ["أسوان", "أبو سمبل", "كوم أمبو"],
-  "أسيوط": ["أسيوط", "ديروط"],
-  "البحيرة": ["دمنهور", "رشيد"],
-  "بني سويف": ["بني سويف", "الواسطى"],
-  "القاهرة": ["القاهرة", "الجيزة", "شبرا الخيمة"],
-  "الدقهلية": ["المنصورة", "ميت غمر"],
-  "دمياط": ["دمياط"],
-  "الفيوم": ["الفيوم", "طامية"],
-  "الغربية": ["طنطا", "كفر الزيات"],
-  "الجيزة": ["الجيزة", "مدينة 6 أكتوبر"],
-  "الإسماعيلية": ["الإسماعيلية"],
-  "كفر الشيخ": ["كفر الشيخ"],
-  "الأقصر": ["الأقصر", "إسنا"],
-  "مطروح": ["مرسى مطروح"],
-  "المنيا": ["المنيا", "بني مزار"],
-  "المنوفية": ["شبين الكوم"],
-  "الوادي الجديد": ["الخارجة", "الداخلة"],
-  "شمال سيناء": ["العريش"],
-  "بورسعيد": ["بورسعيد"],
-  "القليوبية": ["بنها"],
-  "قنا": ["قنا", "نجع حمادي"],
-  "البحر الأحمر": ["الغردقة", "القصير"],
-  "الشرقية": ["الزقازيق"],
-  "سوهاج": ["سوهاج", "جرجا"],
-  "جنوب سيناء": ["شرم الشيخ", "دهب"],
-  "السويس": ["السويس"]
-};
-String selectedGoverMenu = egyptGovernorates[0];
-String selectedCity = cityList[selectedGoverMenu]![0];
-List<String> egyptGovernorates = [
-  'الإسكندرية',
-  'الإسماعيلية',
-  'أسوان',
-  'أسيوط',
-  'الأقصر',
-  'البحر الأحمر',
-  'البحيرة',
-  'بني سويف',
-  'بورسعيد',
-  'جنوب سيناء',
-  'الدقهلية',
-  'دمياط',
-  'الفيوم',
-  'الغربية',
-  'القاهرة',
-  'القليوبية',
-  'قنا',
-  'كفر الشيخ',
-  'مطروح',
-  'المنوفية',
-  'المنيا',
-  'الوادي الجديد',
-  'شمال سيناء',
-  'سوهاج',
-  'السويس'
-];
 ////////////////////////
 /*
 to detect the screen size
@@ -143,21 +18,24 @@ double screenHeight(context) => MediaQuery.of(context).size.height;
 /*
 global keys const
 */
-final formKeyRegister = GlobalKey<FormState>();
+final formKeyUserRegister = GlobalKey<FormState>();
+final formKeyHospitalRegister=GlobalKey<FormState>();
+final formKeyUpdate = GlobalKey<FormState>();
 final formKeyLogin = GlobalKey<FormState>();
 /////////////////////////////////////////////////////
-/*
-text controller
-*/
-TextEditingController phoneNumberRegistration = TextEditingController();
-TextEditingController passwordRegistration = TextEditingController();
-TextEditingController rewritePasswordRegistration = TextEditingController();
-TextEditingController firstNameRegistration = TextEditingController();
-TextEditingController lastNameRegistration = TextEditingController();
-TextEditingController emailAddressRegistration = TextEditingController();
-TextEditingController birthDayRegistration = TextEditingController();
-TextEditingController emailAddressLogin = TextEditingController();
-TextEditingController passwordLogin = TextEditingController();
+
+String? phoneNumberRegis,
+    passwordRegis,
+    rewritePasswordRegis,
+    firstNameRegis,
+    lastNameRegis,
+    emailAddressRegis,
+    passwordLog,
+    donationTimesCo,
+    birthDayRegis,
+    emailAddressLog;
+int donationTimes = 0;
+
 /////////////////////////
 /*
 to control show or hidden password text
@@ -165,31 +43,114 @@ to control show or hidden password text
 bool showPasswordRegistration = true;
 bool showPasswordLogin = true;
 
-////////////////////////
-/*
-date picker constants
-*/
-Future showDatePickerFun(BuildContext context) async {
-  final DateTime? picked = await selectDate(context);
-  if (picked != null) {
-    print('Selected date: $picked');
-    day = picked.day;
-    month = picked.month;
-    year = picked.year;
-    birthDayRegistration.text = 'يوم : $day شهر : $month سنة : $year';
+//////////////////////////////////////
+/*login remember */
+String userID = '';
+String userToken = '';
+bool rememberMe = false;
+String email = '';
+String password = '';
+String userType = '';
+bool isAuthorized() {
+  if (email != '' && password != '' && userType != '') {
+    return true;
+  } else {
+    return false;
   }
 }
-Future<DateTime?> selectDate(BuildContext context) async {
-  final DateTime? picked = await showDatePicker(
-    context: context,
-    initialDate: DateTime(2006),
-    firstDate: DateTime(1900),
-    lastDate: DateTime(2006),
-  );
-  return picked;
+
+/*
+Widget detectScreen(toController1, title,userAndTokenFromApiLoginPost) {
+  if (isAuthorized()) {
+    if (userType == 'شخصي') {
+      return UserHomeScreen(toController1, title: title,userAndTokenFromApiLoginPos:userAndTokenFromApiLoginPost);
+    } else if (userType == 'بنك دم') {
+      return BloodBankHomeScreen();
+    } else {
+      return HospitalHomeScreen();
+    }
+  } else {
+    return LoginScreen();
+  }
 }
-int day = 0;
-int month = 0;
-int year = 0;
+*/
 
+String constTitle = "";
 
+String selectedGenderItemCode = 'm';
+String? userTypeCode() {
+  if (userType != '') {
+    if (userType == 'شخصي') {
+      return 'user';
+    } else if (userType == 'مستشفى') {
+      return 'hospital';
+    } else if (userType == 'بنك دم') {
+      return 'bloodBank';
+    } else {
+      return '';
+    }
+  }
+}
+
+Map? toControllers;
+String cityCode = "1";
+
+Map<String, dynamic> objectFromApiRegisrationPost = {};
+
+Map proccessOfRegistrationReasponse(Map object) {
+  List cityList = (hospitalsMap[object["gov"].toString()]!
+      .toList()
+      .firstWhere((element) => element[3] == (object["city"]))
+      .toList());
+  object["city"] = cityList[2];
+  object["gender"] = object["gender"] == "m" ? "ذكر" : "أنثي";
+  List goverList = (goverListWithItsCode
+      .firstWhere((element) => element[0] == (object["gov"]))
+      .toList());
+  object["gov"] = goverList[1];
+
+  object["birthDate"] = object["birthDate"].toString().split('T')[0];
+
+  return object;
+}
+Map processHospitalRegistrationRespond(Map<String,dynamic> object){
+
+  goverCode=object["gov"];
+
+  object["gov"]=hospitalsMap[object["gov"].toString()]?[0][0];
+
+  hospitalsMap[goverCode.toString()]!.forEach((element) {
+    element[3]==cityCode?object["city"]=element[2]:'';
+  });
+
+  print("from the function $object");
+  return object;
+}
+Map proccessOfUpdateResponse(Map object) {
+  List cityList =  (hospitalsMap[object["gov"].toString()]!
+          .toList()
+          .firstWhere((element) => element[3] == (object["city"]))
+          .toList())
+      ;
+  object["city"] = cityList[2];
+  object["gender"] = object["gender"] == "m" ? "ذكر" : "أنثي";
+  List goverList = (goverListWithItsCode
+      .firstWhere((element) => element[0] == (object["gov"]))
+      .toList());
+  object["gov"] = goverList[1];
+
+  object["birthDate"] = object["birthDate"].toString().split('T')[0];
+
+  return object;
+}
+
+Map? loginReaspons = {};
+Map? registrationReasponse = {};
+Map? objectFromApiLoginPost = {};
+
+Map? userAndTokenFromApiLoginPost = {};
+String selectedHospitalName = hospitalsMap["$goverCode"]![0][4];
+Map objectFromApiUpdatePost = {};
+Map updateResponse = {};
+Map objectFromHospitalRegistration={};
+String firstTimeDonation='''إذا كنت تتبرع بالدم لأول مرة، فقد ينتابك شعور بالتوتر والقلق، وهذا أمر شائع. تأكد من أن الإغماء قبل أو أثناء أو بعد التبرع بالدم أمر نادر الحدوث. موظفونا موهوبون في جعل التجربة سلسة قدر الإمكان. ربما من الأفضل ألا تشاهد الإبرة عند إدخالها، واحرص كذلك على عدم رؤية الدم.''';

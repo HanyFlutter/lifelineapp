@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lifeline/shared/const_validation.dart';
 import 'package:lifeline/shared/constants.dart';
 
 
@@ -10,7 +11,7 @@ Widget phoneNumberText({required TextEditingController controller,}){
       decoration: InputDecoration(
 
         prefix: Icon(Icons.phone_android),
-        suffix: Text('EG +20'),
+        suffix: Text('EG +2'),
         labelText: 'رقم الهاتف ',
         labelStyle:   TextStyle(),
         border: OutlineInputBorder(
